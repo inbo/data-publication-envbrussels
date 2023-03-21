@@ -30,7 +30,7 @@ library(readxl)         # To read Excel files
 
 
 ```{r}
-input_data <- read_delim(here::here("datasets", "atlas_reptilia","data","raw", "gbif_stierkikker_bijvangsten.csv"), ",")
+input_data <- read_delim(here::here("datasets", "atlas_reptilia","data","raw", "20230321_reptilia.csv"), ",")
 ```
 
 
@@ -51,6 +51,7 @@ Clean data somewhat:
 ```{r}
 input_data %<>% 
   remove_empty("rows") %<>%
+  remove_empty("cols") %<>%
   clean_names()
 ```
 

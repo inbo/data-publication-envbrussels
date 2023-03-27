@@ -56,6 +56,15 @@ input_data %<>%
 ```
 
 
+## remove obsolete columns
+
+```{r}
+input_data <- input_data %>% select(-c(email, reproductivecondition,dateentered,firstname, lastname
+                                       ,
+                                       
+                                       ,  ))
+  
+```
 
 
 ### fix unique ID issue

@@ -500,7 +500,7 @@ write_csv(occurrence, here::here("darwincore", "processed", "occurrenceSKBC.csv"
 test <- length(unique(occurrence$eventID))
 test2 <- length(unique(occurrence$occurrenceID))
 n_occur <- data.frame(table(occurrence$occurrenceID))
-traps <- distinct(input_data, fuiktype, .keep_all = FALSE)
+traps <- distinct(input_data, datasetname, .keep_all = FALSE)
 traps2 <- distinct(occurrence, sampleSizeUnit, .keep_all = FALSE)
 
 ```

@@ -21,8 +21,10 @@ library(magrittr)       # To use %<>% pipes
 library(here)           # To find files
 library(janitor)        # To clean input data
 library(readxl)         # To read Excel files
-##library(rgbif)          # To use GBIF services
-##library(uuid)           # To generate UUID's
+##library(rgbif)        # To use GBIF services
+##library(uuid)         # To generate UUID's
+library(sp)             # coordinate transformation
+library(sf)             #coordinate transformation
 ```
 
 # Read source data
@@ -82,6 +84,89 @@ input_data <- input_data %>% select(-c(
 ```{r}
 input_data <- mutate_all(input_data, as.character())
 ```
+# Georeference source data
+
+## Lambert to Decimals
+
+### Keep original x,Y as verbatimcoordinates
+
+We want to keep the original verbatim Coordinates
+The original X,Y will be used for creating decimalLatitude and decimalLongitude
+
+```{r}
+input_data %<>% mutate(Longitude = lambertlongitude) %>%
+                   mutate(Latitude = lambertlatitude)
+```
+### remove columns with NA in lat or long
+
+```{r}
+input_data %<>% drop_na(Longitude)
+```
+
+
+
+### Create a spacial dataframe
+
+Create spatial dataframe and define the CRS (31370 is Belgian Lambert 72)(crs = 28992 is the Dutch system used here)
+We indicate the x,y columns as coordinates and define the coordinate system
+
+```{r}
+input_data = st_as_sf(input_data, coords = c("Longitude","Latitude"), crs = 31370 , agr = "constant" )
+input_data %>% head(n = 5)
+```
+
+## Transform the data in WGS84
+
+Now we transform the Lambert 72 in WGS84
+
+```{r}
+input_data <- st_transform(input_data, crs = 4326)
+input_data %>% head(n = 5)
+```
+
+### Create a dataframe with column decimalLatitude & decimalLongitude
+
+In order to add the decimal coordinates into the original df we create an x_y dataframe
+
+```{r}
+x_y <- as.data.frame(st_coordinates(input_data))
+x_y %>% head(n = 5)
+write_csv(x_y, here::here("datasets", "atlas_reptilia", "data", "interim/x_y.csv"), na = "")
+```
+
+# Create extra dataframe to work with 
+
+```{r}
+input_interim_df <- input_data
+```
+
+# Remove geometry from dataframe 'input_interim_df'
+
+We remove all geometry from the spacial dataframe, to create a normal df
+
+```{r}
+##input_interim_df <- st_geometry(NULL)
+st_geometry(input_interim_df) <- NULL
+input_interim_df %>% head(n = 5)
+```
+
+### Bind columns x_y and input_interim_df
+
+Join both df's to have the decimalLat & Lon
+
+```{r}
+input_interim_df = bind_cols(input_interim_df,x_y, .id = NULL)
+input_interim_df %>% head(n = 5)
+```
+
+### Integrate x-y coordinates in original dataframe
+
+We can safely substitute input_interim 
+
+```{r}
+input_data <- input_interim_df
+```
+
 
 
 # Darwin Core mapping

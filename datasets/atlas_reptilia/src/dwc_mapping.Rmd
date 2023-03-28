@@ -30,7 +30,7 @@ library(readxl)         # To read Excel files
 
 
 ```{r}
-input_data <- read_delim(here::here("datasets", "atlas_reptilia","data","raw", "20230321_reptilia.csv"), ",")
+input_data <- read_delim(here::here("datasets", "atlas_reptilia","data","raw", "20230321_reptilia.csv"), ",", locale = locale(encoding = "windows-1252") )
 ```
 
 
@@ -59,10 +59,20 @@ input_data %<>%
 ## remove obsolete columns
 
 ```{r}
-input_data <- input_data %>% select(-c(email, reproductivecondition,dateentered,firstname, lastname
-                                       ,
-                                       
-                                       ,  ))
+input_data <- input_data %>% select(-c(
+                                email
+                              , reproductivecondition
+                              , dateentered
+                              , firstname
+                              , lastname
+                              , dateentered,
+                              , municipalityid
+                              , municipality_id
+                              , postalcode
+                              , isinbcr
+                              , parent_id
+                              , accepted_id
+                              , gbif_tree_top))
   
 ```
 

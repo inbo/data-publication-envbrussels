@@ -345,16 +345,28 @@ occurrence %<>% mutate(dwc_sex = recode(sexcode
                                         ,"F" = "female"
                                         ,"M" = "male"
                                         ,"IND" = "unknown"
-                                        ,.default = "unknown"
+                                        
                                         ))
 ```
 
 ### lifeStage
 
 ```{r}
-occurrence %<>% mutate(dwc_lifeStage = 'unknown')
+occurrence %<>% mutate(lifeStage2 = gsub("\\//","",lifestage))
+```
 
-#ask Sander for info
+
+```{r}
+occurrence %<>% mutate(dwc_lifeStage = recode(lifestage
+                                        ,"adulte" = "adult"
+                                        ,"subadulte" = "subadult"
+                                        ,"Indéterminé" = "unknown"
+                                        ,"immature" = "subadult"
+                                      #  ,"oeuf '\/'ponte" = "egg"
+                                        ,"mue pellicule" = "adult"    #vervelling = adult
+                                        ))
+
+
 
 ```
 

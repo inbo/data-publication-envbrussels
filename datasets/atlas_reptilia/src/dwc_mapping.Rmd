@@ -66,7 +66,7 @@ input_data <- input_data %>% select(-c(
                               , reproductivecondition
                               , dateentered
                               , firstname
-                              , lastname
+                              #, lastname
                               , dateentered,
                               , municipalityid
                               , municipality_id
@@ -215,7 +215,7 @@ occurrence %<>% mutate(dwc_license = "http://creativecommons.org/publicdomain/ze
 ### rightsHolder
 
 ```{r}
-occurrence %<>% mutate(dwc_rightsHolder = "INBO")
+occurrence %<>% mutate(dwc_rightsHolder = "Brussels Environment")
 ```
 
 ### accessRights
@@ -227,7 +227,7 @@ occurrence %<>% mutate(dwc_accessRights = "http://www.inbo.be/en/norms-for-data-
 ### datasetID
 
 ```{r}
-occurrence %<>% mutate(dwc_datasetID = "https://doi.org/10.15468/daf62d")
+occurrence %<>% mutate(dwc_datasetID = "")
 ```
 
 ### institutionCode
@@ -236,7 +236,7 @@ occurrence %<>% mutate(dwc_datasetID = "https://doi.org/10.15468/daf62d")
 ### datasetName
 
 ```{r}
-occurrence %<>% mutate(dwc_datasetName = "Invasive species - American bullfrog (Lithobates catesbeianus) in Flanders, Belgium (post 2018)")
+occurrence %<>% mutate(dwc_datasetName = "Brussels Environment Reptilia Atlas")
 ```
 
 ### basisOfRecord
@@ -249,7 +249,7 @@ occurrence %<>% mutate(dwc_basisOfRecord = "HumanObservation")
 
 
 ```{r}
-occurrence %<>% mutate(dwc_occurrenceID = occurrence_id)
+occurrence %<>% mutate(dwc_occurrenceID = gsub(" ","",(paste("BE:REP:AT:",event_id))))
 ```
 
 
@@ -258,7 +258,7 @@ occurrence %<>% mutate(dwc_occurrenceID = occurrence_id)
 ### recordedBy
 
 ```{r}
-occurrence %<>% mutate(dwc_recordedBy = recorded_by)
+occurrence %<>% mutate(dwc_recordedBy = lastname)
 ```
 
 ### individualCount
@@ -514,7 +514,7 @@ write_csv(occurrence, here::here("darwincore", "processed", "occurrenceSKBC.csv"
 # Checks
 
 ```{r}
-test <- length(unique(occurrence$eventID))
+test <- length(unique(input_data$eventID))
 test2 <- length(unique(occurrence$occurrenceID))
 n_occur <- data.frame(table(occurrence$occurrenceID))
 traps <- distinct(input_data, datasetname, .keep_all = FALSE)

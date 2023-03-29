@@ -258,7 +258,7 @@ occurrence %<>% mutate(dwc_occurrenceID = gsub(" ","",(paste("BE:REP:AT:",event_
 ### recordedBy
 
 ```{r}
-occurrence %<>% mutate(dwc_recordedBy = lastname)
+occurrence %<>% mutate(dwc_recordedBy = replace_na(lastname, "unknown"))
 ```
 
 ### individualCount

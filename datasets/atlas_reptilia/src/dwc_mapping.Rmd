@@ -167,6 +167,23 @@ We can safely substitute input_interim
 input_data <- input_interim_df
 ```
 
+# FILTER for original datasets
+
+```{r}
+input_data <-  filter(input_data, input_data$datasetname %in% c(
+                "Atlas Amfibieën en Reptielen, data 2017b (Overeenkomst Natuurpunt Studie/AVES Natagora)"
+               ,"Atlas Amfibiën en Reptielen 1984-2003 (Subsidie AVES)"
+               ,"Atlas Amfibiën en Reptielen 2017-2019 (Overeenkomst Natagora/Natuurpunt Studie)"
+               ,"Blauw netwerk (LB-BIM)"
+               ,"Inventarisatie HYLA 2006-2007 (Subsidie Natuurpunt Studie)"
+               ,"Oproep Fauna&Flora"
+               ,"persdataset_Guy Rotsaert"
+               ,"persdataset_Olivier Beck"
+               ,"Watervogeltelling winter Woluwevallei 2003-… (LB-BIM)"
+            ))
+          
+
+```
 
 
 # Darwin Core mapping

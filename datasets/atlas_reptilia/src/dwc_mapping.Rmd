@@ -257,6 +257,8 @@ occurrence %<>% mutate(dwc_occurrenceID = gsub(" ","",(paste("BE:REP:AT:",event_
 
 ### recordedBy
 
+Not sure we should do this here and now
+
 ```{r}
 occurrence %<>% mutate(dwc_recordedBy = replace_na(lastname, "unknown"))
 ```
@@ -266,7 +268,7 @@ occurrence %<>% mutate(dwc_recordedBy = replace_na(lastname, "unknown"))
 ```{r}
 #mutate(occurrence$mm)as.numeric()
   
-occurrence %<>% mutate(dwc_individualCount = '')
+occurrence %<>% mutate(dwc_individualCount = individualcount)
 
 ```
 
@@ -276,24 +278,29 @@ occurrence %<>% mutate(dwc_individualCount = '')
 ### occurrenceStatus
 
 ```{r}
-occurrence %<>% mutate(dwc_occurrenceStatus = 'present')
+occurrence %<>% mutate(dwc_occurrenceStatus = case_when(
+                                              input_data$individualcount > '0' ~ "present"
+                                             ,input_data$individualcount == '0' ~ "absent"
+                                             ))
+
 ```
+### occurrenceRemarks
 
 ```{r}
-occurrence %<>% mutate(dwc_occurrenceRemarks = 'bycatch')
+#occurrence %<>% mutate(dwc_occurrenceRemarks = 'bycatch')
 ```
 
 
 ### eventID
 
 ```{r}
-occurrence %<>% mutate(dwc_eventID = str_replace_all(event_id, " ",""))
+#occurrence %<>% mutate(dwc_eventID = str_replace_all(event_id, " ",""))
 ```
 
 ### eventDate
 
 ```{r}
-occurrence %<>% mutate(dwc_eventDate = datum)
+occurrence %<>% mutate(dwc_eventDate = lubridate::dmy(eventdate))
 ```
 
 
@@ -302,26 +309,25 @@ occurrence %<>% mutate(dwc_eventDate = datum)
 ### habitat
 
 ```{r}
-occurrence %<>% mutate(dwc_habitat = recode(type
-                                            , 'Stilstaand' = 'freshwater; stagnant'))
+#occurrence %<>% mutate(dwc_habitat = habitat)
 ```
 
 ### samplingProtocol
 
 ```{r}
-occurrence %<>% mutate(dwc_samplingProtocol = recode(actie
-                                                     ,"Afvangst" = "catch, fike"
-                                                     
-                                                     )) 
+#occurrence %<>% mutate(dwc_samplingProtocol = recode(actie
+#                                                     ,"Afvangst" = "catch, fike"
+#                                                     
+#                                                     )) 
 ```
 ### sampleSizeValue
 
 ```{r}
-occurrence %<>% mutate(dwc_sampleSizeValue = no_fuiken) 
+#occurrence %<>% mutate(dwc_sampleSizeValue = no_fuiken) 
 ```
 ### sampleSizeUnit
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 occurrence %<>% mutate(dwc_sampleSizeUnit = recode(fuiktype
                                                    ,"dubbele fuik" = "paired fyke"
                                                    ,"salamanderfuik drijvend NA" = "amphibian trap floating"
@@ -335,7 +341,12 @@ occurrence %<>% mutate(dwc_sampleSizeUnit = recode(fuiktype
 ### sex
 
 ```{r}
-occurrence %<>% mutate(dwc_sex = 'unknown')
+occurrence %<>% mutate(dwc_sex = recode(sexcode
+                                        ,"F" = "female"
+                                        ,"M" = "male"
+                                        ,"IND" = "unknown"
+                                        ,.default = "unknown"
+                                        ))
 ```
 
 ### lifeStage

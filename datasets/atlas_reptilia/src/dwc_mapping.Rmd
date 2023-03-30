@@ -169,7 +169,7 @@ input_data <- input_interim_df
 
 # FILTER for original datasets
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 input_data <-  filter(input_data, input_data$datasetname %in% c(
                 "Atlas Amfibieën en Reptielen, data 2017b (Overeenkomst Natuurpunt Studie/AVES Natagora)"
                ,"Atlas Amfibiën en Reptielen 1984-2003 (Subsidie AVES)"
@@ -244,6 +244,12 @@ occurrence %<>% mutate(dwc_datasetName = "Brussels Environment Reptilia Atlas")
 ```{r}
 occurrence %<>% mutate(dwc_basisOfRecord = "HumanObservation")
 ```
+### dynamic Properties
+
+
+```{r}
+occurrence %<>% mutate(dwc_dynamicProperties = paste('{"source":"',datasetname,'"}' )) 
+```
 
 ### occurrenceID
 
@@ -287,7 +293,10 @@ occurrence %<>% mutate(dwc_occurrenceStatus = case_when(
 ### occurrenceRemarks
 
 ```{r}
-#occurrence %<>% mutate(dwc_occurrenceRemarks = 'bycatch')
+occurrence %<>% mutate(dwc_occurrenceRemarks = recode(behavior
+                                                       ,"trouvé mort" = "found dead"
+                                                       ,"sur place"   = "alive"
+                                                        ))
 ```
 
 
@@ -352,7 +361,7 @@ occurrence %<>% mutate(dwc_sex = recode(sexcode
 ### lifeStage
 
 ```{r}
-occurrence %<>% mutate(lifeStage2 = gsub("\\//","",lifestage))
+#occurrence %<>% mutate(lifeStage2 = gsub("\\//","",lifestage))
 ```
 
 
@@ -362,7 +371,7 @@ occurrence %<>% mutate(dwc_lifeStage = recode(lifestage
                                         ,"subadulte" = "subadult"
                                         ,"Indéterminé" = "unknown"
                                         ,"immature" = "subadult"
-                                      #  ,"oeuf '\/'ponte" = "egg"
+                                        ,"oeuf \\/ ponte" = "egg"
                                         ,"mue pellicule" = "adult"    #vervelling = adult
                                         ))
 
@@ -376,13 +385,17 @@ occurrence %<>% mutate(dwc_lifeStage = recode(lifestage
 ```{r}
 occurrence %<>% mutate(dwc_locationID = location_id)
 ```
+### municipality
 
+```{r}
+occurrence %<>% mutate(dwc_municipality = namenl)
+```
 
 ### locality
 
 ```{r}
 
-occurrence %<>% mutate(dwc_locality = paste(locatie))
+occurrence %<>% mutate(dwc_verbatimlocality = verbatimlocality)
 
 
 ```
@@ -399,6 +412,11 @@ occurrence %<>% mutate(dwc_continent = "Europe")
 ```{r}
 occurrence %<>% mutate(dwc_countryCode = 'BE')
 ```
+### stateprovince
+
+```{r}
+occurrence %<>% mutate(dwc_stateProvince = 'Brussels Capital Region')
+```
 
 
 
@@ -411,7 +429,7 @@ occurrence %<>% mutate(dwc_countryCode = 'BE')
 ```{r}
 occurrence %<>% mutate(dwc_decimalLatitude = sprintf(
   "%.5f",
-  round(lat, digits = 5)
+  round(Y, digits = 5)
 ))
 ```
 
@@ -420,7 +438,7 @@ occurrence %<>% mutate(dwc_decimalLatitude = sprintf(
 ```{r}
 occurrence %<>% mutate(dwc_decimalLongitude = sprintf(
   "%.5f",
-  round(long, digits = 5)
+  round(X, digits = 5)
 ))
 ```
 
@@ -435,11 +453,30 @@ occurrence %<>% mutate(dwc_geodeticDatum = "WGS84")
 ```{r}
 occurrence %<>% mutate(dwc_coordinateUncertaintyInMeters = "30")
 ```
+###verbatimlat & long
+
+```{r}
+occurrence %<>% mutate(dwc_verbatimLatitude = lambertlatitude)
+```
+
+```{r}
+occurrence %<>% mutate(dwc_verbatimLongitude = lambertlongitude)
+```
+
+```{r}
+occurrence %<>% mutate(dwc_verbatimCoordinateSystem = "Lambert 72")
+```
+
+```{r}
+occurrence %<>% mutate(dwc_verbatimSRS = "EPSG 4326")
+```
+
+
 ### Identification
 
 
 ```{r}
-occurrence %<>% mutate(dwc_identifiedBy = identified_by)
+#occurrence %<>% mutate(dwc_identifiedBy = identified_by)
 ```
 
 ```{r}
@@ -454,14 +491,12 @@ occurrence %<>% mutate(dwc_identifiedBy = identified_by)
 
 
 
-### scientificName
+
 
 ### scientificName
 
 ```{r}
-occurrence %<>% mutate(dwc_scientificName = recode(scientificname
-                                                     ,"Distycus spec." = "Distycus"
-                                                      ))
+occurrence %<>% mutate(dwc_scientificName = scientific_name)
 
 ```
 
@@ -485,7 +520,13 @@ occurrence %<>% mutate(dwc_kingdom = "Animalia")
 ### taxonRank
 
 ```{r}
-occurrence %<>% mutate(dwc_taxonRank = case_when(dwc_scientificName == 'Distycus' ~ 'genus'
+occurrence %<>% mutate(dwc_taxonRank = case_when(dwc_scientificName == 'Lacertidae' ~ 'family'
+                                                 ,dwc_scientificName == 'Emydidae' ~ 'family'
+                                                 ,dwc_scientificName == 'Testudinidae' ~ 'family'
+                                                 ,dwc_scientificName == 'Apalone Rafinesque, 1832' ~ 'genus'
+                                                 ,dwc_scientificName == 'Pseudemys Gray, 1856' ~ 'genus'
+                                                 ,dwc_scientificName == 'Pogona Storr, 1982' ~ 'genus'
+                                                 ,dwc_scientificName == 'Trachemys Agassiz, 1857' ~ 'genus'
                                                  , TRUE ~ "species"))
 ```
 
@@ -531,7 +572,7 @@ occurrence %>% head()
 Save to CSV:
 
 ```{r}
-write_csv(occurrence, here::here("darwincore", "processed", "occurrenceSKBC.csv"), na = "")
+write_csv(occurrence, here::here("datasets","atlas_reptilia","data", "processed", "occurrence.csv"), na = "")
 ```
 
 # Checks
@@ -541,6 +582,7 @@ test <- length(unique(input_data$eventID))
 test2 <- length(unique(occurrence$occurrenceID))
 n_occur <- data.frame(table(occurrence$occurrenceID))
 traps <- distinct(input_data, datasetname, .keep_all = FALSE)
+checklist <- distinct(input_data, scientific_name, .keep_all = FALSE)
 traps2 <- distinct(occurrence, sampleSizeUnit, .keep_all = FALSE)
 
 ```
